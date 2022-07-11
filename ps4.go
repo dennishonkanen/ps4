@@ -116,7 +116,7 @@ type KeyState uint8
 //go:generate stringer -type=KeyState
 
 const (
-	KeyUp   KeyState = iota
+	KeyUp KeyState = iota
 	KeyDown
 )
 
@@ -145,8 +145,8 @@ func Watch(ctx context.Context, input *Input) (<-chan interface{}, error) {
 		for {
 			event, err := dev.ReadOne()
 			if err != nil {
-				fmt.Printf("Unable to read one: %s\n", err)
-				continue
+				close(events)
+				return
 			}
 
 			if event.Type == 0 {
@@ -180,7 +180,7 @@ func Watch(ctx context.Context, input *Input) (<-chan interface{}, error) {
 			select {
 			case <-ctx.Done():
 				return
-			case events <-e:
+			case events <- e:
 			default:
 			}
 		}
